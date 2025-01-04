@@ -1,6 +1,37 @@
+import { useRef } from "react";
 import "./register.css";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Register() {
+  const emailRef = useRef();
+  const passwordRef = useRef();
+  const confirmPasswordRef = useRef();
+  const usernameRef = useRef();
+  const navigate = useNavigate();
+
+  const handleClick = async(e)=>{
+    e.preventDefault();
+
+    if(passwordRef.current.value !== confirmPasswordRef.current.value){
+      confirmPasswordRef.current.setCustomValidity("Passwords do not match");
+    }else{
+      const user = {
+        username: usernameRef.current.value,
+        email: emailRef.current.value,
+        password: passwordRef.current.value
+      }
+
+      try{
+        await axios.post('auth/register', user)
+        navigate('/login')
+      }catch(err){
+        console.log(err);
+      }
+      
+    }
+  }
+
   return (
     <div className="login">
       <div className="loginWrapper">
@@ -11,17 +42,44 @@ export default function Register() {
           </span>
         </div>
         <div className="loginRight">
-          <div className="loginBox">
-          <input placeholder="Username" className="loginInput" />
-            <input placeholder="Email" className="loginInput" />
-            <input placeholder="Password" className="loginInput" />
-            <input placeholder="Password Again" className="loginInput" />
-            <button className="loginButton">Sign Up</button>
-            
+          <form className="loginBox" onSubmit={handleClick}>
+            <input
+              placeholder="Username"
+              ref={usernameRef}
+              className="loginInput"
+              required
+            />
+            <input
+              placeholder="Email"
+              type="email"
+              ref={emailRef}
+              className="loginInput"
+              required
+            />
+            <input
+              placeholder="Password"
+              type="password"
+              ref={passwordRef}
+              className="loginInput"
+              required
+              minLength={'6'}
+            />
+            <input
+              placeholder="Password Again"
+              type="password"
+              ref={confirmPasswordRef}
+              className="loginInput"
+              required
+              minLength={'6'}
+            />
+            <button type="submit" className="loginButton">
+              Sign Up
+            </button>
+
             <button className="loginRegisterButton">
               Log into your account
             </button>
-          </div>
+          </form>
         </div>
       </div>
     </div>
