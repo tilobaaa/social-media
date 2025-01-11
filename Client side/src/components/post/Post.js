@@ -1,17 +1,24 @@
 import "./post.css";
 import { MoreVert } from "@mui/icons-material";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { format } from "timeago.js";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext";
 
 export default function Post({ post }) {
-  const { desc, photo, userId, comment, likes, createdAt } = post;
+  const { desc, img, userId, comment, likes, createdAt } = post;
 
-  const [likeAmount, setLike] = useState(likes);
+  const [likeAmount, setLike] = useState(likes.length);
   const [isLiked, setIsLiked] = useState(false);
   const PF = process.env.REACT_APP_PUBLIC_FOLDER;
   const [user, setUser] = useState("");
+  const { user: currentUser } = useContext(AuthContext);
+
+  useEffect(() => {
+    setIsLiked(likes.includes(currentUser._id));
+    console.log(likeAmount);
+  }, [likes, currentUser._id, likeAmount]);
 
   useEffect(() => {
     const getUser = async () => {
@@ -22,16 +29,14 @@ export default function Post({ post }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const LikeHandler = () => {
-    // if (isLiked) {
-    //   setLike((prev) => prev - 1); //setLike(prev=> prev - 1);
-    //   setIsLiked(false);
-    // } else {
-    //   setLike((prev) => prev + 1);
-    //   setIsLiked(true);
-    // }
+  const LikeHandler = async () => {
+    try {
+      await axios.put(`/posts/${post._id}/like`, { userId: currentUser._id });
+    } catch (err) {
+      console.log(err);
+    }
 
-    setLike(isLiked ? likeAmount - 1 : likeAmount + 1);
+    setLike((prev) => (isLiked ? prev - 1 : prev + 1));
     setIsLiked((prev) => !prev);
   };
 
@@ -46,7 +51,9 @@ export default function Post({ post }) {
             <Link to={`/profile/${username}`}>
               <img
                 className="postProfilePic"
-                src={profilePicture || PF + "noProfilePic.jpg"}
+                src={
+                  profilePicture ? PF + profilePicture : PF + "noProfilePic.jpg"
+                }
                 alt=""
               />
             </Link>
@@ -60,7 +67,7 @@ export default function Post({ post }) {
         </div>
         <div className="postCenter">
           <span className="postText">{desc}</span>
-          <img className="postImg" src={PF + photo} alt="" />
+          <img className="postImg" src={PF + img} alt="" />
         </div>
         <div className="postBottom">
           <div className="reaction">
