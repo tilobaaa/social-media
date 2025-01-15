@@ -2,7 +2,9 @@
     flex: 3.5;
     
 }
-
+a{
+    text-decoration: none;
+}
 .rightBarWrapper{
     margin: 20px;
 }
@@ -88,3 +90,20 @@
     border-radius: 5px;
 }
 
+.rightBarFollowingButton{
+    margin-top: 30px;
+    margin-bottom: 10px;
+    background-color: #1872f2;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    color: white;
+    display: flex;
+    align-items: center;
+    border: none;
+    font-size: 16px;
+}
+
+.rightBarFollowingButton:focus{
+    outline: none;
+}
